@@ -1,4 +1,3 @@
-// import stuff
 import { LitElement, html, css } from 'lit';
 import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
 import '@shoelace-style/shoelace/dist/components/button/button.js';
@@ -58,109 +57,87 @@ export class TvApp extends LitElement {
         animation-delay: 1s;
         animation-duration: 1s;
         line-height: 1.5;
+        height: 100%;
         font-size: 1em;
       }
-      h5 {
-        font-weight: 400;
+      .title-container{
+        position: relative;
+        align-self: center;
+        margin: 20px;
       }
-      .discord {
-        display: inline-flex;
+      p {
+        font-size: 12px;
       }
-      .middle-page{
-        display: inline-flex;
-      }
-
-.main-content {
-          display: flex;
-          flex-direction: row;
-          margin: 12px;
-        }
- 
-        .player-container {
-          border-radius: 8px;
-          padding: 12px;
-          display: flex;
-          width: 66%;
-        }
- 
-        .player {
-          width: 100%;
-          aspect-ratio: 16/9;
-          border-radius: 8px;
-        }
- 
-        .discord {
-          width: 33%;
-          padding: 12px;
-        }
- 
-        .discord widgetbot {
-          overflow: hidden;
-          background-color: rgb(54, 57, 62);
-          border-radius: 8px;
-          vertical-align: top;
-        }
-        .discord iframe {
-        border-radius: 8px;
-        border: none;
-        width: 100%;
-        height: 100%;
-      }
-      .
-      `,
+      `
     ];
   }
   // LitElement rendering template of your element
   render() {
     return html`
-       <h2>${this.name}</h2>
+      <h2>${this.name}</h2>
       <div class="listing-container">
-      ${this.listings.map(
-      (item) => html`
-            <tv-channel 
+      ${
+        this.listings.map(
+          (item) => html`
+            <tv-channel
+              id="${item.id}"
               title="${item.title}"
               presenter="${item.metadata.author}"
               description="${item.description}"
-              @click="${this.itemClick}"
               video="${item.metadata.source}"
+              @click="${this.itemClick}"
             >
             </tv-channel>
           `
-    )
+        )
       }
       </div>
-      <div class="main-content">
-      <div class="player-container">
+      <div>
+        <h1 class="title-container">
+      ${this.activeItem.title}
+      
+    </h1>
+    <div style="display: inline-flex">
         <!-- video -->
-        <iframe class="player"
-          src="${this.createSource()}"
+        <iframe style="margin: 30px;"
+          width="750"
+          height="400"
+          src="https://www.youtube.com/embed/9MT-BNuUCpM" 
           frameborder="0"
-          allowfullscreen>
-        </iframe>
-       
-       
+          allowfullscreen
+        ></iframe>
+
+        <div>
+        <!-- discord / chat - optional -->
+        <iframe style=""
+          src="https://discord.com/widget?id=YOUR_DISCORD_SERVER_ID&theme=dark"
+          width="400"
+          height="500"
+          allowtransparency="true"
+          frameborder="0"
+          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+        ></iframe>
       </div>
-      <!-- discord / chat - optional -->
-      <div class="discord">
-          <widgetbot server="954008116800938044" channel="1106691466274803723" width="100%" height="100%"><iframe title="WidgetBot Discord chat embed" allow="clipboard-write; fullscreen" src="https://e.widgetbot.io/channels/954008116800938044/1106691466274803723?api=a45a80a7-e7cf-4a79-8414-49ca31324752"></iframe></widgetbot>
-          <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
-        </div>
       </div>
+
+      <tv-channel style="height= " title=${this.activeItem.title} presenter="${this.activeItem.author}">
+    <p id= "description">${this.activeItem.description} </p>
+  </tv-channel>
+
+    </div>
+      <!-- dialog -->
       <sl-dialog label="${this.activeItem.title}" class="dialog">
-      <p>
+
       ${this.activeItem.description}
-    </p>
-        <sl-button slot="footer" variant="primary" @click="${this.closeDialog}">Close</sl-button>
+        <sl-button slot="footer" variant="primary" @click="${this.closeDialog}">WATCH</sl-button>
       </sl-dialog>
-    <
     `;
   }
-
-  changeVideo() {
+changeVideo() {
     const iframe = this.shadowRoot.querySelector('iframe');
     iframe.src = this.createSource();
   }
-  extractVideoId(link) {
+   extractVideoId(link) {
     try {
       const url = new URL(link);
       const searchParams = new URLSearchParams(url.search);
@@ -173,24 +150,33 @@ export class TvApp extends LitElement {
   createSource() {
     return "https://www.youtube.com/embed/" + this.extractVideoId(this.activeItem.video);
   }
-
+  
   closeDialog(e) {
     const dialog = this.shadowRoot.querySelector('.dialog');
     dialog.hide();
   }
 
   itemClick(e) {
-    console.log(e.target);
     this.activeItem = {
       title: e.target.title,
       id: e.target.id,
       description: e.target.description,
       video: e.target.video,
     };
-    this.changeVideo(); // Call changeVideo 
+    this.changeVideo();
     const dialog = this.shadowRoot.querySelector('.dialog');
     dialog.show();
-  }
+  
+
+    // Dispatch custom event with the updated activeItem
+    this.dispatchEvent(
+      new CustomEvent('active-item-changed', {
+        bubbles: true,
+        composed: true,
+        detail: { activeItem: this.activeItem },
+      })
+    );
+  }  
 
   // LitElement life cycle for when any property changes
   updated(changedProperties) {
