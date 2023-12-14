@@ -222,4 +222,4 @@ export class TvApp extends LitElement {
   }
 }
 // tell the browser about our tag and class it should run when it sees it
-customElements.define(TvApp.tag, TvApp);
+customElements.define(TvApp.tag, TvApp);1
