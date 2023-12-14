@@ -9,6 +9,7 @@ export class TvChannel extends LitElement {
     this.presenter = '';
     this.description = '';
     this.video= '';
+    this.timecode = '';
   }
   // convention I enjoy using to define the tag's name
   static get tag() {
@@ -21,6 +22,7 @@ export class TvChannel extends LitElement {
       description: {type: String},
       presenter: { type: String },
       video: {type: String},
+      timecode: {type: String},
     };
   }
   // LitElement convention for applying styles JUST to our element
@@ -30,7 +32,7 @@ export class TvChannel extends LitElement {
         text-rendering: optimizeLegibility;
         box-sizing: inherit;
         display: inline-block;
-        line-height: 1.2;
+        line-height: 1;
         font-size: 1em;
         font-weight: 400;
         min-width: 300px;
@@ -39,19 +41,20 @@ export class TvChannel extends LitElement {
         transition: all 0.25s ease-in-out;
         overflow: hidden;
         text-overflow: ellipsis;
+        cursor: pointer;
       }
       .wrapper {
-        margin: .5rem;
-        padding: .5rem;
-        padding-left: 16px;
-        padding-right: 16px;
-        border-radius: 6px;
+        margin: 8px;
+        padding: 8px;
+        padding-left: 4px;
+        padding-right: 4px;
+        border-radius: 8px;
         border-color: #4a4a4a;
         box-shadow: 0px 0px 0px 1px #dbdbdb;
         background-color: #ffffff;
       }
       p {
-        font-size: 12px;
+        font-size: 10px;
       }
     `;
   }
@@ -59,7 +62,8 @@ export class TvChannel extends LitElement {
   render() {
     return html`
       <div class="wrapper">
-        <h4>${this.title}</h4>
+        <div>${this.timecode}</div>
+        <h3>${this.title}</h3>
         <p>${this.description}</p>
         <slot></slot>
       </div>  
